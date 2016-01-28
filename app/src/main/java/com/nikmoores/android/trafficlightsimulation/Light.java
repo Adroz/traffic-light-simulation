@@ -22,12 +22,16 @@ public class Light {
         this.greenTime = greenTime;
         this.yellowTime = yellowTime;
         this.redDelay = STANDARD_RED_DELAY;
-        timeRemaining = 0;
+        timeRemaining = -1;
     }
 
     public void setToGreen() {
         timeRemaining = greenTime;
         state = State.GREEN;
+    }
+
+    public boolean hasStoppedCycling() {
+        return timeRemaining < 0;
     }
 
     // Step the light through each second.

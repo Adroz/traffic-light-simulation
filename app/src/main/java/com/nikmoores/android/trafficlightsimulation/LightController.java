@@ -32,9 +32,17 @@ public class LightController implements Light.Callback {
      * conditions).
      */
     public void advanceOneSecond() {
-        light1.advanceOneSecond();
-        light2.advanceOneSecond();
-        // wait 1 second.
+        // The ordering of the lights is dependent on which light is cycling and which isn't.
+        // If light1 is waiting, step light2 first in case it triggers a change, letting light1
+        // trigger next.
+        // If this check isn't in place then the GREEN cycle of one light is 1 second longer.
+        if (light1.hasStoppedCycling()) {
+            light2.advanceOneSecond();
+            light1.advanceOneSecond();
+        } else {
+            light1.advanceOneSecond();
+            light2.advanceOneSecond();
+        }
     }
 
     @Override
@@ -43,10 +51,6 @@ public class LightController implements Light.Callback {
             light2.setToGreen();
         } else if (light.equals(light2)) {  // Check the same for the other light (in case there's a
             light1.setToGreen();            // potential for other lights).
-
-            // Step light1 through a second, as light2 always triggers at the end of the tick
-            // (effectively adding 1s to light1's GREEN time).
-            light1.advanceOneSecond();
         }
     }
 
