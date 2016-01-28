@@ -16,12 +16,30 @@ public class Light {
     private int timeRemaining;
     Callback callback;
 
-    public Light(Callback callback, int greenTime, int yellowTime) {
+    // Default constructor
+    public Light(Callback callback) {
+        init(callback, STANDARD_GREEN_TIME, STANDARD_YELLOW_TIME, STANDARD_RED_DELAY);
+    }
+
+    // Constructor allows for customized light configurations.
+    public Light(Callback callback, int greenTime, int yellowTime, int redDelay) {
+        init(callback, greenTime, yellowTime, redDelay);
+    }
+
+    /**
+     * Initialise the Light object
+     *
+     * @param callback   The callback implementation
+     * @param greenTime  The length of time the light is green (seconds)
+     * @param yellowTime The length of time the light is yellow (seconds)
+     * @param redDelay   The length of time the light stays red before notifying the callback (seconds)
+     */
+    private void init(Callback callback, int greenTime, int yellowTime, int redDelay) {
         this.callback = callback;
-        state = State.RED;
         this.greenTime = greenTime;
         this.yellowTime = yellowTime;
-        this.redDelay = STANDARD_RED_DELAY;
+        this.redDelay = redDelay;
+        state = State.RED;
         timeRemaining = -1;
     }
 

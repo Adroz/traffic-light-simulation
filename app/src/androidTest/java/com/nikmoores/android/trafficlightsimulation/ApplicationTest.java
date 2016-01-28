@@ -30,8 +30,9 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
             @Override
             public void onRedLightReady(Light light) {
                 // Do nothing
+                assertFalse("Error: Returned light should not be null!", light == null);
             }
-        }, Light.STANDARD_GREEN_TIME, Light.STANDARD_YELLOW_TIME);
+        });
 
         assertEquals("Light should initialize as RED", State.RED, light.getState());
         light.setToGreen();

@@ -21,8 +21,8 @@ public class LightController implements Light.Callback {
 
     public void initLights() {
         // make one green, make sure the other is red
-        light1 = new Light(this, Light.STANDARD_GREEN_TIME, Light.STANDARD_YELLOW_TIME);
-        light2 = new Light(this, Light.STANDARD_GREEN_TIME, Light.STANDARD_YELLOW_TIME);
+        light1 = new Light(this);
+        light2 = new Light(this);
         light1.setToGreen();
     }
 
