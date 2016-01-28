@@ -69,7 +69,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LightController controller = new LightController();
-        controller.run();
+        // Run the controller off the UI thread
+        new Thread(new Runnable() {
+            public void run() {
+                LightController controller = new LightController();
+                controller.run();
+            }
+        }).start();
     }
 }
