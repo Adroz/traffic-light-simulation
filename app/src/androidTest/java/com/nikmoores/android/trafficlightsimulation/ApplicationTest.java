@@ -16,7 +16,6 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     // after boot, the green light stays green for 20 seconds, whilst the other light stays red
     // after boot, the green light progresses to yellow upon the 21st second...
 
-
     public void testSuite() {
         lightProgressesThroughSequence();
         testBasicLightControllerFunctions();
@@ -27,7 +26,12 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
      * yellow for 20 and 5 seconds respectively.
      */
     private void lightProgressesThroughSequence() {
-        Light light = new Light(Light.STANDARD_GREEN_TIME, Light.STANDARD_YELLOW_TIME);
+        Light light = new Light(new Light.Callback() {
+            @Override
+            public void onRedLightReady(Light light) {
+                // Do nothing
+            }
+        }, Light.STANDARD_GREEN_TIME, Light.STANDARD_YELLOW_TIME);
 
         assertEquals("Light should initialize as RED", State.RED, light.getState());
         light.setToGreen();
@@ -78,7 +82,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         controller.advanceOneSecond();
 
         // *** Start of light2 cycle ***
-        for (int i = 0; i < 26; i++) {
+        for (int i = 0; i < 25; i++) {
             assertEquals("Light1 should stay RED (light2 cycle running)",
                     State.RED, controller.getLight1().getState());
             assertNotSame("Light2 shouldn't be RED until end of cycle (" + (i + 1) + "s)",
@@ -93,6 +97,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
                 State.RED, controller.getLight2().getState());
         controller.advanceOneSecond();
 
+        // *** Start of light1 cycle ***
         assertEquals("Light1 should now be GREEN (light1 cycle started)",
                 State.GREEN, controller.getLight1().getState());
         assertEquals("Light2 should stay RED  (light1 cycle running)",

@@ -3,20 +3,19 @@ package com.nikmoores.android.trafficlightsimulation;
 /**
  * Created by Nik on 13/01/2016.
  */
-public class LightController {
+public class LightController implements Light.Callback {
     Light light1;
     Light light2;
 
-    public static final int STANDARD_RED_TIME = 1;
-    public boolean light1Running;
-    public int redCounter = 0;
+    LightController() {
+        initLights();
+    }
 
     public void initLights() {
         // make one green, make sure the other is red
-        light1 = new Light(Light.STANDARD_GREEN_TIME, Light.STANDARD_YELLOW_TIME);
-        light2 = new Light(Light.STANDARD_GREEN_TIME, Light.STANDARD_YELLOW_TIME);
+        light1 = new Light(this, Light.STANDARD_GREEN_TIME, Light.STANDARD_YELLOW_TIME);
+        light2 = new Light(this, Light.STANDARD_GREEN_TIME, Light.STANDARD_YELLOW_TIME);
         light1.setToGreen();
-        light1Running = true;
     }
 
     /**
@@ -27,44 +26,31 @@ public class LightController {
     public void advanceOneSecond() {
         light1.advanceOneSecond();
         light2.advanceOneSecond();
-        // Check which light is currently running through its sequence
-        if(light1Running){
-            if(light1.getState() == State.RED){
-                // wait one more second before switching lights.
-                if (redCounter == STANDARD_RED_TIME) {
-                    redCounter = 0;
-                    light2.setToGreen();
-                    light1Running = false;
-                } else {
-                    redCounter++;
-                }
-            }
-        }else{
-            if(light2.getState() == State.RED){
-                // wait one more second before switching lights.
-                if (redCounter == STANDARD_RED_TIME) {
-                    redCounter = 0;
-                    light1.setToGreen();
-                    light1Running = true;
-                } else {
-                    redCounter++;
-                }
-            }
-        }
         // wait 1 second.
+    }
 
-        // Add some kind of error check here in case both lights are a combination of GREEN and YELLOW??
+    @Override
+    public void onRedLightReady(Light light) {
+        if (light.equals(light1)) {         // If the first light is red, trigger the second
+            light2.setToGreen();
+        } else if (light.equals(light2)) {  // Check the same for the other light (in case there's a
+            light1.setToGreen();            // potential for other lights).
+
+            // Step light1 through a second, as light2 always triggers at the end of the tick
+            // (effectively adding 1s to light1's GREEN time).
+            light1.advanceOneSecond();
+        }
     }
 
     public String getSystemStateAsString() {
         return "light1-" + light1.toString() + ", light2-" + light2.toString();
     }
 
-    public Light getLight1(){
+    public Light getLight1() {
         return light1;
     }
 
-    public Light getLight2(){
+    public Light getLight2() {
         return light2;
     }
 

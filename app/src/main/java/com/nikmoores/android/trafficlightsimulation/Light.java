@@ -7,19 +7,23 @@ public class Light {
 
     public static final int STANDARD_GREEN_TIME = 20;
     public static final int STANDARD_YELLOW_TIME = 5;
+    public static final int STANDARD_RED_DELAY = 1;
 
     State state;
     int greenTime;
     int yellowTime;
-    int timeRemaining;
+    int redDelay;
+    private int timeRemaining;
+    Callback callback;
 
-    public Light(int greenTime, int yellowTime) {
+    public Light(Callback callback, int greenTime, int yellowTime) {
+        this.callback = callback;
         state = State.RED;
         this.greenTime = greenTime;
         this.yellowTime = yellowTime;
+        this.redDelay = STANDARD_RED_DELAY;
         timeRemaining = 0;
     }
-
 
     public void setToGreen() {
         timeRemaining = greenTime;
@@ -37,21 +41,27 @@ public class Light {
                 break;
             case YELLOW:
                 if (timeRemaining == 0) {
+                    timeRemaining = redDelay;
                     state = State.RED;
                 }
                 break;
-            default:
-                return;
+            default:        // RED
+                if (timeRemaining == 0) {
+                    callback.onRedLightReady(this);
+                } else if (timeRemaining < 0) {
+                    return;
+                }
+                break;
         }
         timeRemaining--;
     }
 
-    public State getState(){
+    public State getState() {
         return state;
     }
 
-    public String toString(){
-        switch (state){
+    public String toString() {
+        switch (state) {
             case GREEN:
                 return "green";
             case YELLOW:
@@ -59,5 +69,14 @@ public class Light {
             default:
                 return "red";
         }
+    }
+
+    public interface Callback {
+        /**
+         * Callback for when a light has been RED for it's set delay length.
+         *
+         * @param light The light triggering the Callback.
+         */
+        void onRedLightReady(Light light);
     }
 }
